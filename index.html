@@ -7,8 +7,29 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
+    <header class="app-header">
+        <div class="header-container">
+            <h1 class="logo">طاقچه</h1>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="جستجو در عنوان و نویسنده...">
+            </div>
+            <nav class="header-nav">
+                <a href="#" id="categories-link">دسته‌ها</a>
+                <a href="#" id="library-link">کتابخانه من</a>
+                <button id="auth-button" class="btn-primary">ورود / ثبت‌نام</button>
+            </nav>
+        </div>
+    </header>
+
     <main id="app">
-        <div id="books-container"></div>
+        <section class="banner-section">
+            <div class="banner">
+                <h2>دنیای کتاب‌های الکترونیکی و صوتی</h2>
+                <p>هزاران کتاب را همیشه همراه خود داشته باشید.</p>
+            </div>
+        </section>
+
+        <div id="home-rows-container"></div>
     </main>
 
     <script src="./js/book.js"></script>
