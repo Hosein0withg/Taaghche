@@ -30,6 +30,44 @@
         </section>
 
         <div id="home-rows-container"></div>
+        <div id="search-view" style="display: none;">
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label for="filter-category">دسته‌بندی:</label>
+                    <select id="filter-category">
+                        <option value="">همه دسته‌ها</option>
+                        <option value="رمان">رمان</option>
+                        <option value="شعر">شعر</option>
+                        <option value="تاریخ">تاریخ</option>
+                    </select>
+                </div>
+                <div class="filter-group checkbox-group">
+                    <input type="checkbox" id="filter-free">
+                    <label for="filter-free">فقط کتاب‌های رایگان</label>
+                </div>
+                <div class="filter-group">
+                    <label for="sort-select">مرتب‌سازی:</label>
+                    <select id="sort-select">
+                        <option value="">پیش‌فرض</option>
+                        <option value="price-asc">ارزان‌ترین</option>
+                        <option value="price-desc">گران‌ترین</option>
+                        <option value="rating-desc">بیشترین امتیاز</option>
+                    </select>
+                </div>
+                <button id="clear-filters" class="btn-secondary">پاک کردن فیلترها</button>
+            </div>
+            
+            <div class="search-info">
+                <p id="results-count"></p>
+            </div>
+
+            <div id="search-results-container" class="books-grid"></div>
+            
+            <div id="no-results-message" class="empty-state" style="display: none;">
+                <p>متأسفانه کتابی با این مشخصات یافت نشد.</p>
+                <button id="back-to-list-btn" class="btn-primary">بازگشت به فهرست همه کتاب‌ها</button>
+            </div>
+        </div>
     </main>
 
     <script src="./js/book.js"></script>
