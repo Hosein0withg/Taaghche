@@ -35,7 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const bannerSection = document.getElementById("banner-section");
     const homeRowsContainer = document.getElementById("home-rows-container");
     const searchView = document.getElementById("search-view");
+    const bookDetailsView = document.getElementById("book-details-view");
     const searchResultsContainer = "search-results-container";
+
+    const sampleModal = document.getElementById("sample-modal");
+    const sampleModalTitle = document.getElementById("sample-modal-title");
+    const sampleModalBody = document.getElementById("sample-modal-body");
+    const closeSampleBtn = document.getElementById("close-sample-btn");
 
     const categoriesBtn = document.getElementById("categories-btn");
     const categoriesDropdown = document.getElementById("categories-dropdown");
@@ -51,14 +57,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const categories = [...new Set(BOOKS_DATA.map(book => book.category))];
 
     function switchView(view) {
+        bannerSection.style.display = "none";
+        homeRowsContainer.style.display = "none";
+        searchView.style.display = "none";
+        bookDetailsView.style.display = "none";
+
         if (view === "home") {
             bannerSection.style.display = "block";
             homeRowsContainer.style.display = "block";
-            searchView.style.display = "none";
         } else if (view === "search") {
-            bannerSection.style.display = "none";
-            homeRowsContainer.style.display = "none";
             searchView.style.display = "block";
+        } else if (view === "details") {
+            bookDetailsView.style.display = "block";
         }
     }
 
@@ -191,6 +201,103 @@ document.addEventListener("DOMContentLoaded", () => {
         UI.renderBookRow("تازه‌های رمان و تاریخ", historyBooks, "home-rows-container", "new");
     }
 
+    function openSampleModal(book) {
+        sampleModalTitle.textContent = `نمونه کتاب: ${book.title}`;
+        sampleModalBody.textContent = book.sampleText || "متن نمونه‌ای برای این کتاب ثبت نشده است.";
+        sampleModal.style.display = "flex";
+    }
+
+    function closeSampleModal() {
+        sampleModal.style.display = "none";
+    }
+
+    function renderBookDetailsPage(bookId) {
+        switchView("details");
+        const book = BOOKS_DATA.find(b => b.id === bookId);
+
+        if (!book) {
+            UI.showBookNotFound();
+            return;
+        }
+
+        UI.renderBookDetails(book);
+
+        const relatedBooks = BOOKS_DATA
+            .filter(b => b.category === book.category && b.id !== book.id)
+            .slice(0, 3);
+
+        if (relatedBooks.length > 0) {
+            UI.renderBookRow("کتاب‌های مرتبط", relatedBooks, "related-books-container", "all");
+            const relatedSeeAll = document.querySelector("#related-books-container .see-all-link");
+            if (relatedSeeAll) {
+                relatedSeeAll.href = `index.html?category=${encodeURIComponent(book.category)}`;
+            }
+        }
+
+        const favBtn = document.getElementById("btn-fav");
+        const buyBtn = document.getElementById("btn-buy");
+        const sampleBtn = document.getElementById("btn-sample");
+
+        const updateFavBtnUI = () => {
+            if (AppState.favorites.includes(book.id)) {
+                favBtn.textContent = "حذف از علاقه‌مندی";
+                favBtn.classList.add("active");
+            } else {
+                favBtn.textContent = "افزودن به علاقه‌مندی";
+                favBtn.classList.remove("active");
+            }
+        };
+
+        const updateBuyBtnUI = () => {
+            if (AppState.library.includes(book.id)) {
+                buyBtn.textContent = "موجود در کتابخانه";
+                buyBtn.classList.add("in-library");
+            } else {
+                buyBtn.textContent = book.price === 0 ? "دریافت رایگان" : `خرید (${book.price} تومان)`;
+                buyBtn.classList.remove("in-library");
+            }
+        };
+
+        updateFavBtnUI();
+        updateBuyBtnUI();
+
+        favBtn.addEventListener("click", () => {
+            AppState.toggleFavorite(book.id);
+            updateFavBtnUI();
+        });
+
+        buyBtn.addEventListener("click", () => {
+            if (AppState.library.includes(book.id)) {
+                alert("این کتاب قبلاً به کتابخانه شما اضافه شده است.");
+                return;
+            }
+
+            if (book.price === 0) {
+                AppState.addToLibrary(book.id);
+                updateBuyBtnUI();
+                alert("کتاب رایگان با موفقیت به کتابخانه شما اضافه شد.");
+            } else {
+                const confirmed = confirm(`آیا از خرید کتاب «${book.title}» به مبلغ ${book.price} تومان اطمینان دارید؟`);
+                if (confirmed) {
+                    AppState.addToLibrary(book.id);
+                    updateBuyBtnUI();
+                    alert("خرید با موفقیت انجام شد و کتاب به کتابخانه شما اضافه گردید.");
+                }
+            }
+        });
+
+        sampleBtn.addEventListener("click", () => {
+            openSampleModal(book);
+        });
+    }
+
+    closeSampleBtn.addEventListener("click", closeSampleModal);
+    sampleModal.addEventListener("click", (e) => {
+        if (e.target === sampleModal) {
+            closeSampleModal();
+        }
+    });
+
     homeLogo.addEventListener("click", () => {
         FiltersState.query = "";
         FiltersState.category = "";
@@ -254,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const listQuery = urlParams.get("list");
 
     if (bookId) {
-        console.log("Showing book details for:", bookId);
+        renderBookDetailsPage(bookId);
     } else if (categoryQuery) {
         FiltersState.category = categoryQuery;
         categorySelect.value = categoryQuery;

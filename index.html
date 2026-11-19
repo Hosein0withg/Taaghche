@@ -33,6 +33,7 @@
         </section>
 
         <div id="home-rows-container"></div>
+
         <div id="search-view" style="display: none;">
             <div class="filters-bar">
                 <div class="filter-group">
@@ -56,14 +57,28 @@
                 </div>
                 <button id="clear-filters" class="btn-secondary">پاک کردن فیلترها</button>
             </div>
+
             <div class="search-info">
                 <p id="results-count"></p>
             </div>
 
             <div id="search-results-container" class="books-grid"></div>
+
             <div id="no-results-message" class="empty-state" style="display: none;">
                 <p>متأسفانه کتابی با این مشخصات یافت نشد.</p>
                 <button id="back-to-list-btn" class="btn-primary">بازگشت به فهرست همه کتاب‌ها</button>
+            </div>
+        </div>
+
+        <div id="book-details-view" style="display: none;"></div>
+
+        <div id="sample-modal" class="modal-backdrop" style="display: none;">
+            <div class="modal-content sample-modal-content">
+                <div class="modal-header">
+                    <h3 id="sample-modal-title"></h3>
+                    <button type="button" id="close-sample-btn" class="btn-secondary">بستن نمونه</button>
+                </div>
+                <div id="sample-modal-body" class="sample-text-body"></div>
             </div>
         </div>
     </main>

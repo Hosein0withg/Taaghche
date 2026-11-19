@@ -104,5 +104,105 @@ const UI = {
         section.appendChild(header);
         section.appendChild(wrapper);
         container.appendChild(section);
+    },
+
+    showBookNotFound: function() {
+        const container = document.getElementById("book-details-view");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        const box = document.createElement("div");
+        box.className = "empty-state";
+
+        const msg = document.createElement("p");
+        msg.textContent = "کتاب یافت نشد";
+
+        const backLink = document.createElement("a");
+        backLink.href = "index.html";
+        backLink.className = "btn-primary";
+        backLink.style.textDecoration = "none";
+        backLink.style.display = "inline-block";
+        backLink.textContent = "بازگشت به صفحه اصلی";
+
+        box.appendChild(msg);
+        box.appendChild(backLink);
+        container.appendChild(box);
+    },
+
+    renderBookDetails: function(book) {
+        const container = document.getElementById("book-details-view");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        const detailsWrapper = document.createElement("div");
+        detailsWrapper.className = "book-details-container";
+
+        const coverCol = document.createElement("div");
+        coverCol.className = "book-details-cover";
+
+        const img = document.createElement("img");
+        img.src = book.cover;
+        img.alt = book.title;
+        coverCol.appendChild(img);
+
+        const infoCol = document.createElement("div");
+        infoCol.className = "book-details-info";
+
+        const title = document.createElement("h2");
+        title.className = "book-details-title";
+        title.textContent = book.title;
+
+        const meta = document.createElement("div");
+        meta.className = "book-details-meta";
+
+        const authorSpan = document.createElement("span");
+        authorSpan.textContent = `نویسنده: ${book.author}`;
+
+        const categorySpan = document.createElement("span");
+        categorySpan.textContent = `دسته: ${book.category}`;
+
+        const ratingSpan = document.createElement("span");
+        ratingSpan.textContent = `امتیاز: ${book.rating} ★`;
+
+        meta.append(authorSpan, categorySpan, ratingSpan);
+
+        const price = document.createElement("p");
+        price.className = "book-details-price";
+        price.textContent = book.price === 0 ? "قیمت: رایگان" : `قیمت: ${book.price} تومان`;
+
+        const desc = document.createElement("p");
+        desc.className = "book-details-description";
+        desc.textContent = book.description;
+
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "book-actions";
+
+        const buyBtn = document.createElement("button");
+        buyBtn.type = "button";
+        buyBtn.className = "btn-action btn-buy";
+        buyBtn.id = "btn-buy";
+
+        const favBtn = document.createElement("button");
+        favBtn.type = "button";
+        favBtn.className = "btn-action btn-fav";
+        favBtn.id = "btn-fav";
+
+        const sampleBtn = document.createElement("button");
+        sampleBtn.type = "button";
+        sampleBtn.className = "btn-action btn-sample";
+        sampleBtn.id = "btn-sample";
+        sampleBtn.textContent = "باز کردن نمونه";
+
+        actionsDiv.append(buyBtn, favBtn, sampleBtn);
+        infoCol.append(title, meta, price, desc, actionsDiv);
+        detailsWrapper.append(coverCol, infoCol);
+        container.appendChild(detailsWrapper);
+
+        const relatedDiv = document.createElement("div");
+        relatedDiv.className = "related-books-section";
+        relatedDiv.id = "related-books-container";
+        container.appendChild(relatedDiv);
     }
 };
