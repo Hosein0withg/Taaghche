@@ -15,7 +15,7 @@ const Storage = {
             console.error(`Error saving ${key} to localStorage`, e);
         }
     },
-    clear: function() {
+    clear: function () {
         localStorage.clear();
-    }
+    },
 };

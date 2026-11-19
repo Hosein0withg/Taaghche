@@ -1,17 +1,27 @@
 const UI = {
-    createBookCard: function(book, options = {}) {
+    createBookCard: function (book, options = {}) {
         const card = document.createElement("div");
         card.className = "book-card";
+        card.tabIndex = 0;
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-label", `مشاهده جزییات کتاب ${book.title}`);
 
         const favBtn = document.createElement("button");
         favBtn.type = "button";
         favBtn.className = "card-fav-btn";
         favBtn.dataset.bookId = book.id;
-        favBtn.title = "علاقه‌مندی";
 
-        const isFav = Array.isArray(options.favorites) && options.favorites.includes(book.id);
+        const isFav =
+            Array.isArray(options.favorites) &&
+            options.favorites.includes(book.id);
         favBtn.classList.toggle("active", isFav);
         favBtn.textContent = isFav ? "♥" : "♡";
+        favBtn.setAttribute(
+            "aria-label",
+            isFav
+                ? `حذف ${book.title} از علاقه‌مندی`
+                : `افزودن ${book.title} به علاقه‌مندی`,
+        );
 
         favBtn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -22,7 +32,7 @@ const UI = {
 
         const img = document.createElement("img");
         img.src = book.cover;
-        img.alt = book.title;
+        img.alt = `جلد کتاب ${book.title}`;
         img.className = "book-cover";
 
         const title = document.createElement("h3");
@@ -48,26 +58,40 @@ const UI = {
         card.appendChild(rating);
         card.appendChild(price);
 
-        card.addEventListener("click", () => {
+        const openDetails = () => {
             window.location.href = `index.html?bookId=${book.id}`;
+        };
+
+        card.addEventListener("click", openDetails);
+        card.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openDetails();
+            }
         });
 
         return card;
     },
 
-    renderBooksList: function(books, containerId, options = {}) {
+    renderBooksList: function (books, containerId, options = {}) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
         container.innerHTML = "";
 
-        books.forEach(book => {
+        books.forEach((book) => {
             const card = this.createBookCard(book, options);
             container.appendChild(card);
         });
     },
 
-    renderBookRow: function(title, books, containerId, categoryQuery, options = {}) {
+    renderBookRow: function (
+        title,
+        books,
+        containerId,
+        categoryQuery,
+        options = {},
+    ) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
@@ -93,17 +117,21 @@ const UI = {
         wrapper.className = "row-carousel-wrapper";
 
         const prevBtn = document.createElement("button");
+        prevBtn.type = "button";
         prevBtn.className = "carousel-btn prev";
+        prevBtn.setAttribute("aria-label", "اسکرول به راست");
         prevBtn.textContent = "‹";
 
         const nextBtn = document.createElement("button");
+        nextBtn.type = "button";
         nextBtn.className = "carousel-btn next";
+        nextBtn.setAttribute("aria-label", "اسکرول به چپ");
         nextBtn.textContent = "›";
 
         const row = document.createElement("div");
         row.className = "books-row";
 
-        books.forEach(book => {
+        books.forEach((book) => {
             row.appendChild(this.createBookCard(book, options));
         });
 
@@ -124,7 +152,7 @@ const UI = {
         container.appendChild(section);
     },
 
-    showBookNotFound: function() {
+    showBookNotFound: function () {
         const container = document.getElementById("book-details-view");
         if (!container) return;
 
@@ -148,7 +176,7 @@ const UI = {
         container.appendChild(box);
     },
 
-    renderBookDetails: function(book) {
+    renderBookDetails: function (book) {
         const container = document.getElementById("book-details-view");
         if (!container) return;
 
@@ -162,7 +190,7 @@ const UI = {
 
         const img = document.createElement("img");
         img.src = book.cover;
-        img.alt = book.title;
+        img.alt = `جلد کتاب ${book.title}`;
         coverCol.appendChild(img);
 
         const infoCol = document.createElement("div");
@@ -188,7 +216,8 @@ const UI = {
 
         const price = document.createElement("p");
         price.className = "book-details-price";
-        price.textContent = book.price === 0 ? "قیمت: رایگان" : `قیمت: ${book.price} تومان`;
+        price.textContent =
+            book.price === 0 ? "قیمت: رایگان" : `قیمت: ${book.price} تومان`;
 
         const desc = document.createElement("p");
         desc.className = "book-details-description";
@@ -211,7 +240,15 @@ const UI = {
         sampleBtn.type = "button";
         sampleBtn.className = "btn-action btn-sample";
         sampleBtn.id = "btn-sample";
-        sampleBtn.textContent = "باز کردن نمونه";
+
+        const hasSample = Boolean(book.sampleText && book.sampleText.trim());
+        if (hasSample) {
+            sampleBtn.textContent = "باز کردن نمونه";
+        } else {
+            sampleBtn.textContent = "نمونه مطالعه موجود نیست";
+            sampleBtn.disabled = true;
+            sampleBtn.title = "برای این کتاب متن نمونه ثبت نشده است";
+        }
 
         actionsDiv.append(buyBtn, favBtn, sampleBtn);
         infoCol.append(title, meta, price, desc, actionsDiv);
@@ -224,7 +261,7 @@ const UI = {
         container.appendChild(relatedDiv);
     },
 
-    renderLibraryView: function(libraryBooks, favoriteBooks, callbacks) {
+    renderLibraryView: function (libraryBooks, favoriteBooks, callbacks) {
         const container = document.getElementById("library-view");
         if (!container) return;
 
@@ -257,10 +294,10 @@ const UI = {
             const receivedGrid = document.createElement("div");
             receivedGrid.className = "books-grid";
 
-            libraryBooks.forEach(book => {
+            libraryBooks.forEach((book) => {
                 const card = this.createBookCard(book, {
                     favorites: callbacks.favorites,
-                    onToggleFavorite: callbacks.onToggleFavorite
+                    onToggleFavorite: callbacks.onToggleFavorite,
                 });
 
                 const actions = document.createElement("div");
@@ -272,7 +309,7 @@ const UI = {
                 openBtn.textContent = "باز کردن کتاب";
                 openBtn.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    callbacks.onOpenBook(book);
+                    callbacks.onOpenBook(book, openBtn);
                 });
 
                 actions.appendChild(openBtn);
@@ -304,10 +341,10 @@ const UI = {
             const favGrid = document.createElement("div");
             favGrid.className = "books-grid";
 
-            favoriteBooks.forEach(book => {
+            favoriteBooks.forEach((book) => {
                 const card = this.createBookCard(book, {
                     favorites: callbacks.favorites,
-                    onToggleFavorite: callbacks.onToggleFavorite
+                    onToggleFavorite: callbacks.onToggleFavorite,
                 });
 
                 const actions = document.createElement("div");
@@ -331,5 +368,5 @@ const UI = {
         }
 
         container.append(receivedSection, favSection);
-    }
+    },
 };
