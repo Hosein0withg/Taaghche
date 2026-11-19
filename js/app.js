@@ -26,15 +26,19 @@ const FiltersState = {
     query: "",
     category: "",
     isFree: false,
-    sort: ""
+    sort: "",
+    preset: ""
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+    const homeLogo = document.getElementById("home-logo");
+    const bannerSection = document.getElementById("banner-section");
     const homeRowsContainer = document.getElementById("home-rows-container");
-    const bannerSection = document.querySelector(".banner-section");
     const searchView = document.getElementById("search-view");
     const searchResultsContainer = "search-results-container";
 
+    const categoriesBtn = document.getElementById("categories-btn");
+    const categoriesDropdown = document.getElementById("categories-dropdown");
     const searchInput = document.getElementById("search-input");
     const categorySelect = document.getElementById("filter-category");
     const freeCheckbox = document.getElementById("filter-free");
@@ -43,24 +47,79 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultsCountText = document.getElementById("results-count");
     const noResultsMessage = document.getElementById("no-results-message");
     const backToListBtn = document.getElementById("back-to-list-btn");
-    const categoriesLink = document.getElementById("categories-link");
+
+    const categories = [...new Set(BOOKS_DATA.map(book => book.category))];
 
     function switchView(view) {
         if (view === "home") {
-            homeRowsContainer.style.display = "block";
             bannerSection.style.display = "block";
+            homeRowsContainer.style.display = "block";
             searchView.style.display = "none";
         } else if (view === "search") {
-            homeRowsContainer.style.display = "none";
             bannerSection.style.display = "none";
+            homeRowsContainer.style.display = "none";
             searchView.style.display = "block";
         }
+    }
+
+    function openCategoryList(categoryName) {
+        FiltersState.query = "";
+        FiltersState.category = categoryName;
+        FiltersState.isFree = false;
+        FiltersState.sort = "";
+        FiltersState.preset = "";
+
+        searchInput.value = "";
+        categorySelect.value = categoryName;
+        freeCheckbox.checked = false;
+        sortSelect.value = "";
+
+        categoriesDropdown.style.display = "none";
+
+        const nextUrl = categoryName
+            ? `index.html?category=${encodeURIComponent(categoryName)}`
+            : "index.html?list=all";
+        window.history.pushState({}, "", nextUrl);
+
+        applyFiltersAndRender();
+    }
+
+    function initializeCategoriesUI() {
+        categories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            categorySelect.appendChild(option);
+        });
+
+        categoriesDropdown.innerHTML = "";
+        const allItem = document.createElement("button");
+        allItem.type = "button";
+        allItem.className = "dropdown-item";
+        allItem.textContent = "همه کتاب‌ها";
+        allItem.addEventListener("click", () => openCategoryList(""));
+        categoriesDropdown.appendChild(allItem);
+
+        categories.forEach(cat => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "dropdown-item";
+            item.textContent = cat;
+            item.addEventListener("click", () => openCategoryList(cat));
+            categoriesDropdown.appendChild(item);
+        });
     }
 
     function applyFiltersAndRender() {
         let results = [...BOOKS_DATA];
 
-        if (FiltersState.query) {
+        if (FiltersState.preset === "suggested" && !FiltersState.sort) {
+            results.sort((a, b) => b.rating - a.rating);
+        } else if (FiltersState.preset === "new") {
+            results = results.filter(b => b.category === "تاریخ" || b.category === "رمان");
+        }
+
+        if (FiltersState.query.trim()) {
             const q = FiltersState.query.trim().toLowerCase();
             results = results.filter(b =>
                 b.title.toLowerCase().includes(q) ||
@@ -84,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
             results.sort((a, b) => b.rating - a.rating);
         }
 
-
         switchView("search");
         const resultsContainerEl = document.getElementById(searchResultsContainer);
 
@@ -105,14 +163,65 @@ document.addEventListener("DOMContentLoaded", () => {
         FiltersState.category = "";
         FiltersState.isFree = false;
         FiltersState.sort = "";
+        FiltersState.preset = "";
 
         searchInput.value = "";
         categorySelect.value = "";
         freeCheckbox.checked = false;
         sortSelect.value = "";
 
+        if (window.location.search) {
+            window.history.pushState({}, "", "index.html?list=all");
+        }
+
         applyFiltersAndRender();
     }
+
+    function renderHomePage() {
+        switchView("home");
+        homeRowsContainer.innerHTML = "";
+
+        const suggestedBooks = [...BOOKS_DATA].sort((a, b) => b.rating - a.rating).slice(0, 6);
+        UI.renderBookRow("پیشنهادهای طاقچه", suggestedBooks, "home-rows-container", "suggested");
+
+        const freeBooks = BOOKS_DATA.filter(b => b.price === 0);
+        UI.renderBookRow("کتاب‌های رایگان", freeBooks, "home-rows-container", "free");
+
+        const historyBooks = BOOKS_DATA.filter(b => b.category === "تاریخ" || b.category === "رمان").slice(0, 6);
+        UI.renderBookRow("تازه‌های رمان و تاریخ", historyBooks, "home-rows-container", "new");
+    }
+
+    homeLogo.addEventListener("click", () => {
+        FiltersState.query = "";
+        FiltersState.category = "";
+        FiltersState.isFree = false;
+        FiltersState.sort = "";
+        FiltersState.preset = "";
+
+        searchInput.value = "";
+        categorySelect.value = "";
+        freeCheckbox.checked = false;
+        sortSelect.value = "";
+        categoriesDropdown.style.display = "none";
+
+        if (window.location.search) {
+            window.history.pushState({}, "", "index.html");
+        }
+
+        renderHomePage();
+    });
+
+    categoriesBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isHidden = categoriesDropdown.style.display === "none";
+        categoriesDropdown.style.display = isHidden ? "flex" : "none";
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!categoriesDropdown.contains(e.target) && e.target !== categoriesBtn) {
+            categoriesDropdown.style.display = "none";
+        }
+    });
 
     searchInput.addEventListener("input", (e) => {
         FiltersState.query = e.target.value;
@@ -137,37 +246,32 @@ document.addEventListener("DOMContentLoaded", () => {
     clearFiltersBtn.addEventListener("click", resetFilters);
     backToListBtn.addEventListener("click", resetFilters);
 
-    categoriesLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        resetFilters();
-    });
+    initializeCategoriesUI();
 
     const urlParams = new URLSearchParams(window.location.search);
     const bookId = urlParams.get("bookId");
+    const categoryQuery = urlParams.get("category");
     const listQuery = urlParams.get("list");
 
     if (bookId) {
         console.log("Showing book details for:", bookId);
+    } else if (categoryQuery) {
+        FiltersState.category = categoryQuery;
+        categorySelect.value = categoryQuery;
+        applyFiltersAndRender();
     } else if (listQuery) {
-        switchView("search");
         if (listQuery === "free") {
             FiltersState.isFree = true;
             freeCheckbox.checked = true;
         } else if (listQuery === "new") {
-            FiltersState.category = "رمان";
-            categorySelect.value = "رمان";
+            FiltersState.preset = "new";
+        } else if (listQuery === "suggested") {
+            FiltersState.preset = "suggested";
+            FiltersState.sort = "rating-desc";
+            sortSelect.value = "rating-desc";
         }
         applyFiltersAndRender();
     } else {
-        switchView("home");
-        homeRowsContainer.innerHTML = "";
-        const suggestedBooks = [...BOOKS_DATA].sort((a, b) => b.rating - a.rating).slice(0, 6);
-        UI.renderBookRow("پیشنهادهای طاقچه", suggestedBooks, "home-rows-container", "suggested");
-
-        const freeBooks = BOOKS_DATA.filter(b => b.price === 0);
-        UI.renderBookRow("کتاب‌های رایگان", freeBooks, "home-rows-container", "free");
-
-        const historyBooks = BOOKS_DATA.filter(b => b.category === "تاریخ" || b.category === "رمان").slice(0, 6);
-        UI.renderBookRow("تازه‌های رمان و تاریخ", historyBooks, "home-rows-container", "new");
+        renderHomePage();
     }
 });

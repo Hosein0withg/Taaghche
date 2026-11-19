@@ -37,6 +37,17 @@ const UI = {
         return card;
     },
 
+    renderBooksList: function(books, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        books.forEach(book => {
+            const card = this.createBookCard(book);
+            container.appendChild(card);
+        });
+    },
 
     renderBookRow: function(title, books, containerId, categoryQuery) {
         const container = document.getElementById(containerId);
@@ -79,11 +90,11 @@ const UI = {
         });
 
         prevBtn.addEventListener("click", () => {
-            row.scrollBy({ left: 300, behavior: 'smooth' });
+            row.scrollBy({ left: 300, behavior: "smooth" });
         });
 
         nextBtn.addEventListener("click", () => {
-            row.scrollBy({ left: -300, behavior: 'smooth' });
+            row.scrollBy({ left: -300, behavior: "smooth" });
         });
 
         wrapper.appendChild(prevBtn);

@@ -9,12 +9,15 @@
 <body>
     <header class="app-header">
         <div class="header-container">
-            <h1 class="logo">طاقچه</h1>
+            <h1 class="logo" id="home-logo">طاقچه</h1>
             <div class="search-box">
                 <input type="text" id="search-input" placeholder="جستجو در عنوان و نویسنده...">
             </div>
             <nav class="header-nav">
-                <a href="#" id="categories-link">دسته‌ها</a>
+                <div class="nav-dropdown-wrapper">
+                    <button type="button" id="categories-btn" class="nav-link-btn">دسته‌ها ▾</button>
+                    <div id="categories-dropdown" class="categories-dropdown" style="display: none;"></div>
+                </div>
                 <a href="#" id="library-link">کتابخانه من</a>
                 <button id="auth-button" class="btn-primary">ورود / ثبت‌نام</button>
             </nav>
@@ -22,7 +25,7 @@
     </header>
 
     <main id="app">
-        <section class="banner-section">
+        <section class="banner-section" id="banner-section">
             <div class="banner">
                 <h2>دنیای کتاب‌های الکترونیکی و صوتی</h2>
                 <p>هزاران کتاب را همیشه همراه خود داشته باشید.</p>
@@ -36,9 +39,6 @@
                     <label for="filter-category">دسته‌بندی:</label>
                     <select id="filter-category">
                         <option value="">همه دسته‌ها</option>
-                        <option value="رمان">رمان</option>
-                        <option value="شعر">شعر</option>
-                        <option value="تاریخ">تاریخ</option>
                     </select>
                 </div>
                 <div class="filter-group checkbox-group">
@@ -56,13 +56,11 @@
                 </div>
                 <button id="clear-filters" class="btn-secondary">پاک کردن فیلترها</button>
             </div>
-            
             <div class="search-info">
                 <p id="results-count"></p>
             </div>
 
             <div id="search-results-container" class="books-grid"></div>
-            
             <div id="no-results-message" class="empty-state" style="display: none;">
                 <p>متأسفانه کتابی با این مشخصات یافت نشد.</p>
                 <button id="back-to-list-btn" class="btn-primary">بازگشت به فهرست همه کتاب‌ها</button>
