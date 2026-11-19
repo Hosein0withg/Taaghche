@@ -10,6 +10,22 @@
     --border-radius: 12px;
 }
 
+@font-face {
+    font-family: "Dubai";
+    src: url("../assets/fonts/DUBAI-REGULAR.TTF") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Dubai";
+    src: url("../assets/fonts/DUBAI-BOLD.TTF") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -17,7 +33,7 @@
 }
 
 body {
-    font-family: Tahoma, "Segoe UI", system-ui, sans-serif;
+    font-family: "Dubai", Tahoma, system-ui, sans-serif;
     background-color: var(--color-background);
     color: var(--color-text-primary);
     line-height: 1.6;
@@ -571,4 +587,166 @@ body {
     line-height: 2;
     white-space: pre-line;
     text-align: justify;
+}
+
+.book-card {
+    position: relative;
+}
+
+.card-fav-btn {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    background-color: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-size: 1.15rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.15s, color 0.15s, border-color 0.15s;
+    z-index: 5;
+}
+
+.card-fav-btn:hover {
+    transform: scale(1.08);
+}
+
+.card-fav-btn.active {
+    color: #d32f2f;
+    border-color: #ffcdd2;
+    background-color: #ffebee;
+}
+
+.auth-header-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-badge {
+    font-weight: bold;
+    color: var(--color-primary);
+    background-color: rgba(0, 191, 165, 0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-logout {
+    background-color: transparent;
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.btn-logout:hover {
+    background-color: #d32f2f;
+    color: #ffffff;
+}
+
+.library-section {
+    margin-bottom: 44px;
+}
+
+.library-section-title {
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+    color: var(--color-text-primary);
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(0, 191, 165, 0.25);
+}
+
+.library-card-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.library-card-actions button {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.btn-read-book {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.btn-remove-fav {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+}
+
+.auth-modal-content {
+    max-width: 440px;
+}
+
+.auth-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.auth-hint {
+    background-color: rgba(0, 191, 165, 0.1);
+    color: var(--color-text-primary);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field label {
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.form-field input {
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+}
+
+.form-field input:focus {
+    border-color: var(--color-primary);
+}
+
+.field-error {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    min-height: 18px;
+}
+
+.auth-submit-btn {
+    padding: 12px;
+    font-size: 1rem;
+    margin-top: 4px;
 }

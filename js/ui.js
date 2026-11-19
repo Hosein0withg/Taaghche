@@ -1,7 +1,24 @@
 const UI = {
-    createBookCard: function(book) {
+    createBookCard: function(book, options = {}) {
         const card = document.createElement("div");
         card.className = "book-card";
+
+        const favBtn = document.createElement("button");
+        favBtn.type = "button";
+        favBtn.className = "card-fav-btn";
+        favBtn.dataset.bookId = book.id;
+        favBtn.title = "علاقه‌مندی";
+
+        const isFav = Array.isArray(options.favorites) && options.favorites.includes(book.id);
+        favBtn.classList.toggle("active", isFav);
+        favBtn.textContent = isFav ? "♥" : "♡";
+
+        favBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (typeof options.onToggleFavorite === "function") {
+                options.onToggleFavorite(book.id);
+            }
+        });
 
         const img = document.createElement("img");
         img.src = book.cover;
@@ -24,6 +41,7 @@ const UI = {
         price.className = "book-price";
         price.textContent = book.price === 0 ? "رایگان" : book.price + " تومان";
 
+        card.appendChild(favBtn);
         card.appendChild(img);
         card.appendChild(title);
         card.appendChild(author);
@@ -37,19 +55,19 @@ const UI = {
         return card;
     },
 
-    renderBooksList: function(books, containerId) {
+    renderBooksList: function(books, containerId, options = {}) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
         container.innerHTML = "";
 
         books.forEach(book => {
-            const card = this.createBookCard(book);
+            const card = this.createBookCard(book, options);
             container.appendChild(card);
         });
     },
 
-    renderBookRow: function(title, books, containerId, categoryQuery) {
+    renderBookRow: function(title, books, containerId, categoryQuery, options = {}) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
@@ -86,7 +104,7 @@ const UI = {
         row.className = "books-row";
 
         books.forEach(book => {
-            row.appendChild(this.createBookCard(book));
+            row.appendChild(this.createBookCard(book, options));
         });
 
         prevBtn.addEventListener("click", () => {
@@ -204,5 +222,114 @@ const UI = {
         relatedDiv.className = "related-books-section";
         relatedDiv.id = "related-books-container";
         container.appendChild(relatedDiv);
+    },
+
+    renderLibraryView: function(libraryBooks, favoriteBooks, callbacks) {
+        const container = document.getElementById("library-view");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        const receivedSection = document.createElement("section");
+        receivedSection.className = "library-section";
+
+        const receivedTitle = document.createElement("h2");
+        receivedTitle.className = "library-section-title";
+        receivedTitle.textContent = `کتاب‌های دریافت شده (${libraryBooks.length})`;
+        receivedSection.appendChild(receivedTitle);
+
+        if (libraryBooks.length === 0) {
+            const emptyReceived = document.createElement("div");
+            emptyReceived.className = "empty-state";
+
+            const emptyText = document.createElement("p");
+            emptyText.textContent = "هنوز کتابی دریافت یا خریداری نکرده‌اید.";
+
+            const browseBtn = document.createElement("button");
+            browseBtn.type = "button";
+            browseBtn.className = "btn-primary";
+            browseBtn.textContent = "مشاهده کتاب‌ها";
+            browseBtn.addEventListener("click", callbacks.onBrowseBooks);
+
+            emptyReceived.append(emptyText, browseBtn);
+            receivedSection.appendChild(emptyReceived);
+        } else {
+            const receivedGrid = document.createElement("div");
+            receivedGrid.className = "books-grid";
+
+            libraryBooks.forEach(book => {
+                const card = this.createBookCard(book, {
+                    favorites: callbacks.favorites,
+                    onToggleFavorite: callbacks.onToggleFavorite
+                });
+
+                const actions = document.createElement("div");
+                actions.className = "library-card-actions";
+
+                const openBtn = document.createElement("button");
+                openBtn.type = "button";
+                openBtn.className = "btn-read-book";
+                openBtn.textContent = "باز کردن کتاب";
+                openBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    callbacks.onOpenBook(book);
+                });
+
+                actions.appendChild(openBtn);
+                card.appendChild(actions);
+                receivedGrid.appendChild(card);
+            });
+
+            receivedSection.appendChild(receivedGrid);
+        }
+
+        const favSection = document.createElement("section");
+        favSection.className = "library-section";
+
+        const favTitle = document.createElement("h2");
+        favTitle.className = "library-section-title";
+        favTitle.textContent = `علاقه‌مندی‌ها (${favoriteBooks.length})`;
+        favSection.appendChild(favTitle);
+
+        if (favoriteBooks.length === 0) {
+            const emptyFav = document.createElement("div");
+            emptyFav.className = "empty-state";
+
+            const emptyFavText = document.createElement("p");
+            emptyFavText.textContent = "فهرست علاقه‌مندی‌های شما خالی است.";
+
+            emptyFav.appendChild(emptyFavText);
+            favSection.appendChild(emptyFav);
+        } else {
+            const favGrid = document.createElement("div");
+            favGrid.className = "books-grid";
+
+            favoriteBooks.forEach(book => {
+                const card = this.createBookCard(book, {
+                    favorites: callbacks.favorites,
+                    onToggleFavorite: callbacks.onToggleFavorite
+                });
+
+                const actions = document.createElement("div");
+                actions.className = "library-card-actions";
+
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.className = "btn-remove-fav";
+                removeBtn.textContent = "حذف از علاقه‌مندی";
+                removeBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    callbacks.onToggleFavorite(book.id);
+                });
+
+                actions.appendChild(removeBtn);
+                card.appendChild(actions);
+                favGrid.appendChild(card);
+            });
+
+            favSection.appendChild(favGrid);
+        }
+
+        container.append(receivedSection, favSection);
     }
 };

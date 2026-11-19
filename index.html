@@ -18,8 +18,10 @@
                     <button type="button" id="categories-btn" class="nav-link-btn">دسته‌ها ▾</button>
                     <div id="categories-dropdown" class="categories-dropdown" style="display: none;"></div>
                 </div>
-                <a href="#" id="library-link">کتابخانه من</a>
-                <button id="auth-button" class="btn-primary">ورود / ثبت‌نام</button>
+                <a href="index.html?view=library" id="library-link">کتابخانه من</a>
+                <div id="auth-header-area" class="auth-header-area">
+                    <button type="button" id="auth-button" class="btn-primary">ورود / ثبت‌نام</button>
+                </div>
             </nav>
         </div>
     </header>
@@ -72,13 +74,38 @@
 
         <div id="book-details-view" style="display: none;"></div>
 
+        <div id="library-view" style="display: none;"></div>
+
         <div id="sample-modal" class="modal-backdrop" style="display: none;">
             <div class="modal-content sample-modal-content">
                 <div class="modal-header">
                     <h3 id="sample-modal-title"></h3>
-                    <button type="button" id="close-sample-btn" class="btn-secondary">بستن نمونه</button>
+                    <button type="button" id="close-sample-btn" class="btn-secondary">بستن</button>
                 </div>
                 <div id="sample-modal-body" class="sample-text-body"></div>
+            </div>
+        </div>
+
+        <div id="auth-modal" class="modal-backdrop" style="display: none;">
+            <div class="modal-content auth-modal-content">
+                <div class="modal-header">
+                    <h3>ورود به حساب کاربری</h3>
+                    <button type="button" id="close-auth-btn" class="btn-secondary">بستن</button>
+                </div>
+                <form id="auth-form" class="auth-form" novalidate>
+                    <p id="auth-login-hint" class="auth-hint" style="display: none;">برای دریافت کتاب یا افزودن به علاقه‌مندی‌ها ابتدا وارد حساب کاربری خود شوید.</p>
+                    <div class="form-field">
+                        <label for="auth-name">نام کاربری</label>
+                        <input type="text" id="auth-name">
+                        <span id="auth-name-error" class="field-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="auth-phone">شماره موبایل</label>
+                        <input type="text" id="auth-phone" dir="ltr">
+                        <span id="auth-phone-error" class="field-error"></span>
+                    </div>
+                    <button type="submit" class="btn-primary auth-submit-btn">ورود</button>
+                </form>
             </div>
         </div>
     </main>
